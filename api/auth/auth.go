@@ -42,10 +42,6 @@ func (s *AuthServer) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		s.SendError(w, errUserNotFound)
 		return
 	}
-	if u.Password != body.Password {
-		s.SendError(w, errPassword)
-		return
-	}
 	if err := u.ComparePassword(body.Password); err != nil {
 		s.SendError(w, err)
 	}
@@ -62,7 +58,6 @@ func (s *AuthServer) HandleRegister(w http.ResponseWriter, r *http.Request) {
 	var body = struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
-		RP       string `json:"rp"`
 		Email    string `json:"email"`
 	}{}
 
@@ -79,7 +74,7 @@ func (s *AuthServer) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		Password: body.Password,
 		Email:    body.Email,
 	}
-	err = user.TableUser.Create(us)
+	err = us.Create()
 	if err != nil {
 		s.SendError(w, err)
 		return
